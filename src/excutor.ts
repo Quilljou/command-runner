@@ -3,8 +3,11 @@ import * as fs from 'fs';
 import * as os from 'os';
 
 const TmpDir = os.tmpdir();
+const storageKey = 'command_runner_mru';
 
 export default class Excutor {
+    constructor(private context: vscode.ExtensionContext) {}
+
     private terminal: vscode.Terminal | null = null;
     private fileUri: vscode.Uri | undefined;
     public excute(fileUri: vscode.Uri | undefined) {
@@ -34,13 +37,48 @@ export default class Excutor {
             if(!commands) {
                 return;
             }
-            vscode.window.showQuickPick(Object.keys(commands)).then((key) => {
+            const sortedCommandNames = this.sortCommand(commands);
+            vscode.window.showQuickPick(sortedCommandNames).then((key) => {
                 if(key) {
+                    this.setKeyDownCount(key);
                     const command = commands[key];
                     this.excuteCommand(command, cwd !== workspace, cwd!);
                 }
-            })
+            });
         }
+    }
+
+    private setKeyDownCount(key: string) {
+        const keys = this.context.globalState.get<Array<string>>(storageKey, []);
+        const index = keys.indexOf(key);
+        if (index > -1) {
+            const picked = keys.splice(index, 1)[0];
+            keys.unshift(picked);
+        } else {
+            keys.unshift(key);
+        }
+        console.log(keys);
+        this.context.globalState.update(storageKey, keys);
+    }
+
+    private sortCommand(commands: { [k: string]: string; }) {
+        const mrus = this.context.globalState.get<Array<string>>(storageKey, []);
+        const validMrus: string[] = [];
+        mrus.forEach((item, index) => {
+            if(commands[item]) {
+                const picked = mrus.slice(index,index+1)[0];
+                validMrus.push(picked);
+            }
+        });
+        this.context.globalState.update(storageKey, validMrus);
+
+        const notInMrus: string[] = [];
+        Object.keys(commands).forEach(item => {
+            if(!validMrus.includes(item)) {
+                notInMrus.push(item);
+            }
+        });
+        return [...validMrus, ...notInMrus];
     }
 
     public onDidCloseTerminal(): void {

@@ -5,7 +5,7 @@ import Excutor from './excutor';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-    const excutor = new Excutor();
+    const excutor = new Excutor(context);
 
     vscode.window.onDidCloseTerminal(function() {
         excutor.onDidCloseTerminal();

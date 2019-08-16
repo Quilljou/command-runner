@@ -1,11 +1,11 @@
 # command-runner
-> inspired By vscode-code-runner
+> Inspired By vscode-code-runner
 
-Tested in macOS
+Tested on macOS
 
 ## Usage
 
-### Define command
+### Define your commands
 Define your own command in `settings.json`, like that
 
 ```json
@@ -24,6 +24,11 @@ Predefined placeholders (like `$fullName` above) are listed below
 
 if the placeholder above can't be found in the specific excution, it will be removed
 
+### Run your command
+- right click on file in file exploer
+- `cmd + shift + p`, then type `Run commands`
+- use shortcuts, cmd+shift+c
+
 ## CWD (current working directory)
 
 cwd is up to the code below.
@@ -41,7 +46,22 @@ if(fileUri) {
 ```
 
 
-## Extension Settings
 
-No Settings
 
+## Development
+
+- Install dependencies
+
+```shell
+yarn
+```
+
+- Compile source code
+
+```sh
+yarn watch
+```
+
+- Start Development version of vscode
+
+<pre>F5</pre>
